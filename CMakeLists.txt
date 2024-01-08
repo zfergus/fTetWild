@@ -56,7 +56,8 @@ endif()
 
 ################################################################################
 
-project(FloatTetwild)
+project(FloatTetwild
+		LANGUAGES C CXX)
 
 # FloatTetwild options
 option(FLOAT_TETWILD_ENABLE_TBB          "Enable TBB"                     ON)
@@ -106,21 +107,21 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ################################################################################
 
 # Add an empty library and fill in the list of sources in `src/ftetwild/CMakeLists.txt`.
-add_library(${PROJECT_NAME})
-add_library(ftetwild::ftetwild ALIAS ${PROJECT_NAME})
+add_library(FloatTetwild)
+add_library(ftetwild::ftetwild ALIAS FloatTetwild)
 
 # Add Sources
 add_subdirectory("${FLOAT_TETWILD_SOURCE_DIR}")
 
 # Public include directory for FloatTetwild
-target_include_directories(${PROJECT_NAME} PUBLIC "${FLOAT_TETWILD_INCLUDE_DIR}")
+target_include_directories(FloatTetwild PUBLIC "${FLOAT_TETWILD_INCLUDE_DIR}")
 
 ################################################################################
 # Optional Definitions
 ################################################################################
 
 if(FLOAT_TETWILD_USE_FLOAT)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC FLOAT_TETWILD_USE_FLOAT)
+	target_compile_definitions(FloatTetwild PUBLIC FLOAT_TETWILD_USE_FLOAT)
 endif()
 
 ################################################################################
@@ -129,30 +130,30 @@ endif()
 
 # libigl
 include(libigl)
-target_link_libraries(${PROJECT_NAME} PUBLIC igl::core igl::predicates)
+target_link_libraries(FloatTetwild PUBLIC igl::core igl::predicates)
 
 # geogram
 include(geogram)
-target_link_libraries(${PROJECT_NAME} PUBLIC geogram)
+target_link_libraries(FloatTetwild PUBLIC geogram)
 
 # spdlog
 include(spdlog)
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
+target_link_libraries(FloatTetwild PUBLIC spdlog::spdlog)
 
 # C++11 Threads
 find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+target_link_libraries(FloatTetwild PUBLIC Threads::Threads)
 
 # fast_winding_number
 # NOTE: Disabled
 
 # json
 include(json)
-target_link_libraries(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(FloatTetwild PUBLIC nlohmann_json::nlohmann_json)
 
 # GMP
 find_package(GMP)
-target_link_libraries(${PROJECT_NAME} PUBLIC gmp::gmp)
+target_link_libraries(FloatTetwild PUBLIC gmp::gmp)
 
 # MPFR
 # NOTE: Disabled
@@ -160,37 +161,37 @@ target_link_libraries(${PROJECT_NAME} PUBLIC gmp::gmp)
 # TBB
 if(FLOAT_TETWILD_ENABLE_TBB)
 	include(onetbb)
-	target_link_libraries(${PROJECT_NAME} PUBLIC TBB::tbb)
+	target_link_libraries(FloatTetwild PUBLIC TBB::tbb)
 endif()
 
 # FastEnvelope
 if(FLOAT_TETWILD_WITH_EXACT_ENVELOPE)
 	include(fast_envelope)
-	target_link_libraries(${PROJECT_NAME} PUBLIC fast_envelope::fast_envelope)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC NEW_ENVELOPE)
+	target_link_libraries(FloatTetwild PUBLIC fast_envelope::fast_envelope)
+	target_compile_definitions(FloatTetwild PUBLIC NEW_ENVELOPE)
 endif()
 
 # Sanitizers
 if(FLOAT_TETWILD_WITH_SANITIZERS)
 	include(sanitizer)
-	add_sanitizers(${PROJECT_NAME})
+	add_sanitizers(FloatTetwild)
 endif()
 
 if(FLOAT_TETWILD_TOPLEVEL_PROJECT AND TARGET igl::tetgen)
-	target_link_libraries(${PROJECT_NAME} PUBLIC igl::tetgen)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC -DLIBIGL_WITH_TETGEN)
+	target_link_libraries(FloatTetwild PUBLIC igl::tetgen)
+	target_compile_definitions(FloatTetwild PUBLIC -DLIBIGL_WITH_TETGEN)
 endif()
 
 # Extra warnings (link last for highest priority)
 include(ftetwild_warnings)
-target_link_libraries(${PROJECT_NAME} PRIVATE ftetwild::warnings)
+target_link_libraries(FloatTetwild PRIVATE ftetwild::warnings)
 
 ################################################################################
 # Compiler options
 ################################################################################
 
 # Use C++11
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+target_compile_features(FloatTetwild PUBLIC cxx_std_11)
 
 ################################################################################
 # FloatTetwild binary
@@ -198,24 +199,24 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
 
 # Main executable
 if(FLOAT_TETWILD_TOPLEVEL_PROJECT)
-	add_executable(${PROJECT_NAME}_bin src/main.cpp)
-	target_compile_features(${PROJECT_NAME}_bin PUBLIC ${CXX14_FEATURES})
+	add_executable(FloatTetwild_bin src/main.cpp)
+	target_compile_features(FloatTetwild_bin PUBLIC ${CXX14_FEATURES})
 
-	target_link_libraries(${PROJECT_NAME}_bin PUBLIC ftetwild::ftetwild)
+	target_link_libraries(FloatTetwild_bin PUBLIC ftetwild::ftetwild)
 
 	include(cli11)
-	target_link_libraries(${PROJECT_NAME}_bin PUBLIC CLI11::CLI11)
+	target_link_libraries(FloatTetwild_bin PUBLIC CLI11::CLI11)
 
 	include(ftetwild_warnings)
-	target_link_libraries(${PROJECT_NAME}_bin PRIVATE ftetwild::warnings)
+	target_link_libraries(FloatTetwild_bin PRIVATE ftetwild::warnings)
 
 	if(FLOAT_TETWILD_WITH_SANITIZERS)
 		include(sanitizer)
-		add_sanitizers(${PROJECT_NAME}_bin)
+		add_sanitizers(FloatTetwild_bin)
 	endif()
 
 	if(NOT (${CMAKE_VERSION} VERSION_LESS "3.6.0"))
-		set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME}_bin)
+		set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT FloatTetwild_bin)
 	endif()
 endif()
 
@@ -224,7 +225,7 @@ endif()
 ################################################################################
 
 # set(MESH_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
-# target_compile_definitions(${PROJECT_NAME} PUBLIC -DFLOAT_TETWILD_MESH_PATH=\"${MESH_PATH}\")
+# target_compile_definitions(FloatTetwild PUBLIC -DFLOAT_TETWILD_MESH_PATH=\"${MESH_PATH}\")
 
 # Compile extras only if this is a top-level project
 if(FLOAT_TETWILD_TOPLEVEL_PROJECT)
