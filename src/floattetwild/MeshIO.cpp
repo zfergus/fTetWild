@@ -9,7 +9,7 @@
 #include "MeshIO.hpp"
 
 #include <floattetwild/MeshImprovement.h>
-#include <floattetwild/external/MSHSaver.h>
+#include <floattetwild/external/MshSaver.h>
 #include <floattetwild/Logger.hpp>
 
 #include <igl/Timer.h>
@@ -163,7 +163,7 @@ void write_mesh_aux(const std::string&              path,
         PyMesh::VectorI T_flat(cnt_t * 4);
         PyMesh::VectorI C_flat;
 
-        if (separate_components)
+        if(separate_components)
             C_flat.resize(cnt_t);
 
         size_t index = 0;
@@ -277,80 +277,80 @@ bool MeshIO::load_mesh(const std::string&     path,
 }
 
 bool MeshIO::load_mesh(const std::string&     path,
-                       std::vector<Vector3>&  points,
-                       std::vector<Vector3i>& faces,
-                       GEO::Mesh&             input,
-                       std::vector<int>&      flags,
-                       std::vector<double>&   epsr_flags)
-{
-    logger().debug("Loading mesh at {}...", path);
-    igl::Timer timer;
-    timer.start();
+                           std::vector<Vector3>&  points,
+                           std::vector<Vector3i>& faces,
+                           GEO::Mesh&             input,
+                           std::vector<int>&      flags,
+                           std::vector<double>& epsr_flags)
+    {
+        logger().debug("Loading mesh at {}...", path);
+        igl::Timer timer;
+        timer.start();
 
-    input.clear(false, false);
+        input.clear(false, false);
 
-    const bool ok = GEO::mesh_load(path, input);
+        const bool ok = GEO::mesh_load(path, input);
 
-    if (!ok)
-        return false;
+        if (!ok)
+            return false;
 
-    bool is_valid = (flags.size() == input.facets.nb());
-    if (is_valid) {
-        assert(flags.size() == input.facets.nb());
-        GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
-            bflags[index] = flags[index];
+        bool is_valid = (flags.size() == input.facets.nb());
+        if (is_valid) {
+            assert(flags.size() == input.facets.nb());
+            GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
+            for (int index = 0; index < (int)input.facets.nb(); ++index) {
+                bflags[index] = flags[index];
+            }
         }
-    }
-    bool is_valid_epsr = (epsr_flags.size() == input.facets.nb());
-    if (is_valid_epsr) {
-        GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
-            eflags[index] = epsr_flags[index];
+        bool is_valid_epsr = (epsr_flags.size() == input.facets.nb());
+        if (is_valid_epsr) {
+            GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
+            for (int index = 0; index < (int)input.facets.nb(); ++index) {
+                eflags[index] = epsr_flags[index];
+            }
         }
-    }
 
-    if (!input.facets.are_simplices()) {
-        mesh_repair(input,
-                    GEO::MeshRepairMode(GEO::MESH_REPAIR_TRIANGULATE | GEO::MESH_REPAIR_QUIET));
-    }
-
-    // #ifdef FLOAT_TETWILD_USE_FLOAT
-    // 		input.vertices.set_single_precision();
-    // #else
-    // 		input.vertices.set_double_precision();
-    // #endif
-
-    GEO::mesh_reorder(input, GEO::MESH_ORDER_MORTON);
-
-    if (is_valid) {
-        flags.clear();
-        flags.resize(input.facets.nb());
-        GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
-            flags[index] = bflags[index];
+        if (!input.facets.are_simplices()) {
+            mesh_repair(input,
+                        GEO::MeshRepairMode(GEO::MESH_REPAIR_TRIANGULATE | GEO::MESH_REPAIR_QUIET));
         }
-    }
-    if (is_valid_epsr) {
-        epsr_flags.clear();
-        epsr_flags.resize(input.facets.nb());
-        GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
-            epsr_flags[index] = eflags[index];
+
+        // #ifdef FLOAT_TETWILD_USE_FLOAT
+        // 		input.vertices.set_single_precision();
+        // #else
+        // 		input.vertices.set_double_precision();
+        // #endif
+
+        GEO::mesh_reorder(input, GEO::MESH_ORDER_MORTON);
+
+        if (is_valid) {
+            flags.clear();
+            flags.resize(input.facets.nb());
+            GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
+            for (int index = 0; index < (int)input.facets.nb(); ++index) {
+                flags[index] = bflags[index];
+            }
         }
+        if(is_valid_epsr){
+            epsr_flags.clear();
+            epsr_flags.resize(input.facets.nb());
+            GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
+            for (int index = 0; index < (int)input.facets.nb(); ++index) {
+                epsr_flags[index] = eflags[index];
+            }
+        }
+
+        points.resize(input.vertices.nb());
+        for (size_t i = 0; i < points.size(); i++)
+            points[i] << (input.vertices.point(i))[0], (input.vertices.point(i))[1],
+                    (input.vertices.point(i))[2];
+
+        faces.resize(input.facets.nb());
+        for (size_t i = 0; i < faces.size(); i++)
+            faces[i] << input.facets.vertex(i, 0), input.facets.vertex(i, 1), input.facets.vertex(i, 2);
+
+        return ok;
     }
-
-    points.resize(input.vertices.nb());
-    for (size_t i = 0; i < points.size(); i++)
-        points[i] << (input.vertices.point(i))[0], (input.vertices.point(i))[1],
-          (input.vertices.point(i))[2];
-
-    faces.resize(input.facets.nb());
-    for (size_t i = 0; i < faces.size(); i++)
-        faces[i] << input.facets.vertex(i, 0), input.facets.vertex(i, 1), input.facets.vertex(i, 2);
-
-    return ok;
-}
 
 void MeshIO::load_mesh(std::vector<Vector3>&  points,
                        std::vector<Vector3i>& faces,
@@ -364,17 +364,20 @@ void MeshIO::load_mesh(std::vector<Vector3>&  points,
 
     input.clear();
     input.vertices.create_vertices((int)points.size());
-    for (int i = 0; i < (int)input.vertices.nb(); ++i) {
-        GEO::vec3& p = input.vertices.point(i);
-        p[0]         = points[i](0);
-        p[1]         = points[i](1);
-        p[2]         = points[i](2);
+    for (int i = 0; i < (int)input.vertices.nb(); ++i)
+    {
+        GEO::vec3 &p = input.vertices.point(i);
+        p[0] = points[i](0);
+        p[1] = points[i](1);
+        p[2] = points[i](2);
     }
     // Setup faces
     input.facets.create_triangles((int)faces.size());
 
-    for (int c = 0; c < (int)input.facets.nb(); ++c) {
-        for (int lv = 0; lv < 3; ++lv) {
+    for (int c = 0; c < (int)input.facets.nb(); ++c)
+    {
+        for (int lv = 0; lv < 3; ++lv)
+        {
             input.facets.set_vertex(c, lv, faces[c](lv));
         }
     }
@@ -413,25 +416,24 @@ void MeshIO::load_mesh(std::vector<Vector3>&  points,
                        std::vector<Vector3i>& faces,
                        GEO::Mesh&             input,
                        std::vector<int>&      flags,
-                       std::vector<double>&   epsr_flags)
-{
+                       std::vector<double>& epsr_flags) {
     logger().debug("Loading mesh from data...");
     igl::Timer timer;
     timer.start();
     input.clear(false, false);
 
     input.clear();
-    input.vertices.create_vertices((int)points.size());
-    for (int i = 0; i < (int)input.vertices.nb(); ++i) {
-        GEO::vec3& p = input.vertices.point(i);
-        p[0]         = points[i](0);
-        p[1]         = points[i](1);
-        p[2]         = points[i](2);
+    input.vertices.create_vertices((int) points.size());
+    for (int i = 0; i < (int) input.vertices.nb(); ++i) {
+        GEO::vec3 &p = input.vertices.point(i);
+        p[0] = points[i](0);
+        p[1] = points[i](1);
+        p[2] = points[i](2);
     }
     // Setup faces
-    input.facets.create_triangles((int)faces.size());
+    input.facets.create_triangles((int) faces.size());
 
-    for (int c = 0; c < (int)input.facets.nb(); ++c) {
+    for (int c = 0; c < (int) input.facets.nb(); ++c) {
         for (int lv = 0; lv < 3; ++lv) {
             input.facets.set_vertex(c, lv, faces[c](lv));
         }
@@ -441,14 +443,14 @@ void MeshIO::load_mesh(std::vector<Vector3>&  points,
     if (is_valid) {
         assert(flags.size() == input.facets.nb());
         GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
+        for (int index = 0; index < (int) input.facets.nb(); ++index) {
             bflags[index] = flags[index];
         }
     }
     bool is_valid_epsr = (epsr_flags.size() == input.facets.nb());
     if (is_valid_epsr) {
         GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
+        for (int index = 0; index < (int) input.facets.nb(); ++index) {
             eflags[index] = epsr_flags[index];
         }
     }
@@ -459,11 +461,11 @@ void MeshIO::load_mesh(std::vector<Vector3>&  points,
         flags.clear();
         flags.resize(input.facets.nb());
         GEO::Attribute<int> bflags(input.facets.attributes(), "bbflags");
-        for (int index = 0; index < (int)input.facets.nb(); ++index) {
+        for (int index = 0; index < (int) input.facets.nb(); ++index) {
             flags[index] = bflags[index];
         }
     }
-    if (is_valid_epsr) {
+    if(is_valid_epsr){
         epsr_flags.clear();
         epsr_flags.resize(input.facets.nb());
         GEO::Attribute<double> eflags(input.facets.attributes(), "eflags");
@@ -475,7 +477,7 @@ void MeshIO::load_mesh(std::vector<Vector3>&  points,
     points.resize(input.vertices.nb());
     for (size_t i = 0; i < points.size(); i++)
         points[i] << (input.vertices.point(i))[0], (input.vertices.point(i))[1],
-          (input.vertices.point(i))[2];
+                (input.vertices.point(i))[2];
 
     faces.resize(input.facets.nb());
     for (size_t i = 0; i < faces.size(); i++)
@@ -496,27 +498,13 @@ void MeshIO::write_mesh(const std::string&      path,
     if (only_interior) {
         const auto skip_tet    = [&mesh](const int i) { return mesh.tets[i].is_outside; };
         const auto skip_vertex = [&mesh](const int i) { return mesh.tet_vertices[i].is_outside; };
-        write_mesh_aux(path,
-                       mesh,
-                       t_ids,
-                       std::vector<Scalar>(),
-                       binary,
-                       separate_components,
-                       skip_tet,
-                       skip_vertex);
+        write_mesh_aux(path, mesh, t_ids, std::vector<Scalar>(), binary, separate_components, skip_tet, skip_vertex);
     }
     else {
         timer.start();
         const auto skip_tet    = [&mesh](const int i) { return mesh.tets[i].is_removed; };
         const auto skip_vertex = [&mesh](const int i) { return mesh.tet_vertices[i].is_removed; };
-        write_mesh_aux(path,
-                       mesh,
-                       t_ids,
-                       std::vector<Scalar>(),
-                       binary,
-                       separate_components,
-                       skip_tet,
-                       skip_vertex);
+        write_mesh_aux(path, mesh, t_ids, std::vector<Scalar>(), binary, separate_components, skip_tet, skip_vertex);
     }
 
     timer.stop();
@@ -540,14 +528,12 @@ void MeshIO::write_mesh(const std::string&         path,
     if (only_interior) {
         const auto skip_tet    = [&mesh](const int i) { return mesh.tets[i].is_outside; };
         const auto skip_vertex = [&mesh](const int i) { return mesh.tet_vertices[i].is_outside; };
-        write_mesh_aux(
-          path, mesh, t_ids, color, binary, separate_components, skip_tet, skip_vertex);
+        write_mesh_aux(path, mesh, t_ids, color, binary, separate_components, skip_tet, skip_vertex);
     }
     else {
         const auto skip_tet    = [&mesh](const int i) { return mesh.tets[i].is_removed; };
         const auto skip_vertex = [&mesh](const int i) { return mesh.tet_vertices[i].is_removed; };
-        write_mesh_aux(
-          path, mesh, t_ids, color, binary, separate_components, skip_tet, skip_vertex);
+        write_mesh_aux(path, mesh, t_ids, color, binary, separate_components, skip_tet, skip_vertex);
     }
 
     timer.stop();

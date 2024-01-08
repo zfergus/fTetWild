@@ -11,26 +11,25 @@
 #include <Eigen/Sparse>
 #include <queue>
 
-void floatTetWild::bfs_orient(const Eigen::Matrix<int, Eigen::Dynamic, 3>& F,
-                              Eigen::Matrix<int, Eigen::Dynamic, 3>&       FF,
-                              Eigen::VectorXi&                             C)
-{
+void floatTetWild::bfs_orient(const Eigen::Matrix<int, Eigen::Dynamic, 3> &F, Eigen::Matrix<int, Eigen::Dynamic, 3> &FF, Eigen::VectorXi &C) {
     Eigen::SparseMatrix<int> A;
     igl::orientable_patches(F, C, A);
 
     // number of faces
     const int m = F.rows();
     // number of patches
-    const int       num_cc = C.maxCoeff() + 1;
-    Eigen::VectorXi seen   = Eigen::VectorXi::Zero(m);
+    const int num_cc = C.maxCoeff() + 1;
+    Eigen::VectorXi seen = Eigen::VectorXi::Zero(m);
 
     // Edge sets
-    const int ES[3][2] = {{1, 2}, {2, 0}, {0, 1}};
+    const int ES[3][2] = {{1, 2},
+                          {2, 0},
+                          {0, 1}};
 
-    if (((void*)&FF) != ((void*)&F))
+    if (((void *) &FF) != ((void *) &F))
         FF = F;
 
-        // loop over patches
+    // loop over patches
 #pragma omp parallel for
     for (int c = 0; c < num_cc; c++) {
         std::queue<int> Q;
@@ -41,7 +40,7 @@ void floatTetWild::bfs_orient(const Eigen::Matrix<int, Eigen::Dynamic, 3>& F,
                 if (cnt == 0)
                     Q.push(f);
                 cnt++;
-                //                break;
+//                break;
             }
         }
         if (cnt < 5)

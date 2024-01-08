@@ -322,8 +322,8 @@ int main(int argc, char** argv)
     if (V_in.rows() != 0 && T_in.rows() != 0 && values.rows() != 0) {
         params.apply_sizing_field = true;
 
-        params.V_sizing_field      = V_in;
-        params.T_sizing_field      = T_in;
+        params.V_sizing_field = V_in;
+        params.T_sizing_field = T_in;
         params.values_sizing_field = values;
     }
 
@@ -640,26 +640,26 @@ int main(int argc, char** argv)
     return EXIT_SUCCESS;
 }
 
-// #include <igl/readSTL.h>
-// #include <igl/writeSTL.h>
-// #include <igl/writeOFF.h>
-//  void connect_2_meshes(std::string m1, std::string m2, std::string m) {
-//     Eigen::MatrixXd v1, v2, _;
-//     Eigen::MatrixXi f1, f2;
+//#include <igl/readSTL.h>
+//#include <igl/writeSTL.h>
+//#include <igl/writeOFF.h>
+// void connect_2_meshes(std::string m1, std::string m2, std::string m) {
+//    Eigen::MatrixXd v1, v2, _;
+//    Eigen::MatrixXi f1, f2;
 //
-//     igl::readSTL(m1, v1, f1, _);
-//     igl::readSTL(m2, v2, f2, _);
+//    igl::readSTL(m1, v1, f1, _);
+//    igl::readSTL(m2, v2, f2, _);
 //
-//     MatrixXd V(v1.rows() + v2.rows(), v1.cols());
-//     V << v1, v2;
+//    MatrixXd V(v1.rows() + v2.rows(), v1.cols());
+//    V << v1, v2;
 //
-//     int v1_rows = v1.rows();
-//     for (int i = 0; i < f2.rows(); i++) {
-//         for (int j = 0; j < 3; j++)
-//             f2(i, j) += v1_rows;
-//     }
-//     MatrixXi F(f1.rows() + f2.rows(), f1.cols());
-//     F << f1, f2;
+//    int v1_rows = v1.rows();
+//    for (int i = 0; i < f2.rows(); i++) {
+//        for (int j = 0; j < 3; j++)
+//            f2(i, j) += v1_rows;
+//    }
+//    MatrixXi F(f1.rows() + f2.rows(), f1.cols());
+//    F << f1, f2;
 //
 ////    igl::writeOFF(m+".off", V, F);
 //    igl::writeSTL(m+".stl", V, F);
@@ -673,7 +673,7 @@ int main(int argc, char** argv)
 //    //pausee();
 //}
 //
-// #include <igl/readMESH.h>
+//#include <igl/readMESH.h>
 // void test_manifold(std::string& file_name){
 //    Eigen::MatrixXd V;
 //    Eigen::MatrixXi T, F;
