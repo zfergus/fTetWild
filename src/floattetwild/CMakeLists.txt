@@ -2,7 +2,6 @@ set(SOURCES
 	AABBWrapper.h
 	AABBWrapper.cpp
 
-
 	auto_table.hpp
 	auto_table.cpp
 
@@ -29,11 +28,11 @@ set(SOURCES
 
 	FloatTetDelaunay.h
 	FloatTetDelaunay.cpp
-		TriangleInsertion.cpp
-		TriangleInsertion.h
+	TriangleInsertion.cpp
+	TriangleInsertion.h
 
-		CutMesh.cpp
-		CutMesh.h
+	CutMesh.cpp
+	CutMesh.h
 
 	intersections.h
 	intersections.cpp
@@ -57,10 +56,8 @@ set(SOURCES
 	Statistics.h
 )
 
-prepend_current_path(SOURCES)
-float_tetwild_copy_headers(${SOURCES})
-float_tetwild_set_source_group(${SOURCES})
-target_sources(FloatTetwild PRIVATE ${SOURCES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Source Files" FILES ${SOURCES})
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCES})
 
 ################################################################################
 # Subfolders
