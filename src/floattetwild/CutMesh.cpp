@@ -608,11 +608,10 @@ bool floatTetWild::CutMesh::get_intersecting_edges_and_points(std::vector<Vector
 //        time_get_intersecting_edges_and_points2 += timer.getElapsedTime();
         if (!is_result) {
             //fortest
-            cout << "seg_plane_intersection no result!" << endl;
-            cout << to_plane_dists[e[0]] << ", " << to_plane_dists[e[1]] << endl;
-            cout << get_to_plane_dist(mesh.tet_vertices[v1_id].pos) << ", "
-                 << get_to_plane_dist(mesh.tet_vertices[v2_id].pos) << endl;
-            cout << "e[0] = " << e[0] << endl;
+            logger().warn("seg_plane_intersection no result!");
+            logger().warn("{}, {}", to_plane_dists[e[0]], to_plane_dists[e[1]]);
+            logger().warn("{}, {}", get_to_plane_dist(mesh.tet_vertices[v1_id].pos), get_to_plane_dist(mesh.tet_vertices[v2_id].pos));
+            logger().warn("e[0] = {}", e[0]);
             //fortest
             return false;
         }
@@ -691,10 +690,10 @@ bool floatTetWild::CutMesh::check() {
 
         Scalar dist = get_to_plane_dist(mesh.tet_vertices[gv_id].pos);
         if (std::fabs(dist) < mesh.params.eps_coplanar && to_plane_dists[lv_id] != 0 && !is_snapped[lv_id]) {
-            cout << "wrong vertex in cut mesh" << endl;
-            cout << dist << endl;
-            cout << to_plane_dists[lv_id] << endl;
-            cout << is_snapped[lv_id] << endl;
+            logger().warn("wrong vertex in cut mesh");
+            logger().warn(dist);
+            logger().warn(to_plane_dists[lv_id]);
+            logger().warn(is_snapped[lv_id]);
             is_good = false;
         }
     }

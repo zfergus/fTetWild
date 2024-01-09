@@ -19,7 +19,7 @@ void SLtest() {
 	int ion;
 	Parameters params;
 	Subdivision::SLIntersection(params, cutface, linepoints0, linepoints1, cutOrnot, interp, t, ion);
-	std::cout << cutOrnot << "\n" << ion << "\n" << t << std::endl;
+	logger().info("\n{}\n{}\n{}", cutOrnot, ion, t);
 }
 
 

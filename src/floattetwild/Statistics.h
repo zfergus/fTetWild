@@ -10,6 +10,7 @@
 
 #include <floattetwild/external/get_mem.h>
 #include <floattetwild/Mesh.hpp>
+#include <floattetwild/Logger.hpp>
 #include <mutex>
 
 namespace floatTetWild {
@@ -71,8 +72,7 @@ namespace floatTetWild {
                     s.id != StateInfo::swapping_id && s.id != StateInfo::smoothing_id)
                     time += s.time;
             }
-            cout << -1 << ", " << time << ", " << states_.back().v_num << ", " << states_.back().t_num
-                 << ", " << states_.back().cnt_fail_inserted_face << endl;
+            logger().info("{}, {}, {}, {}, {}", -1, time, states_.back().v_num, states_.back().t_num, states_.back().cnt_fail_inserted_face);
         }
 
         friend std::ostream &operator<<(std::ostream &stream, const Statistics &stats) {

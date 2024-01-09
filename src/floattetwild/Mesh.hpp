@@ -10,7 +10,7 @@
 
 #include <floattetwild/Parameters.h>
 #include <floattetwild/Types.hpp>
-
+#include <floattetwild/Logger.hpp>
 
 // #ifdef FLOAT_TETWILD_USE_TBB
 // #include <tbb/concurrent_vector.h>
@@ -146,7 +146,7 @@ public:
         }
 
         inline void print() const {
-            cout<<indices[0]<<" "<<indices[1]<<" "<<indices[2]<<" "<<indices[3]<<endl;
+            logger().info("{} {} {} {}", indices[0], indices[1], indices[2], indices[3]);
         }
 
         std::array<char, 4> is_surface_fs = {{NOT_SURFACE, NOT_SURFACE, NOT_SURFACE, NOT_SURFACE}};

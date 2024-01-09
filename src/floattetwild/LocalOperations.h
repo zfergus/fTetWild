@@ -90,9 +90,10 @@ namespace floatTetWild {
     }
     template<typename T>
     void vector_print(const std::vector<T>& v, std::string s = " "){
+        std::stringstream ss;
         for(auto i: v)
-            cout<<i<<s;
-        cout<<endl;
+            ss<<i<<s;
+        logger().info(ss.str());
     }
     template<typename T>
     bool vector_contains(const std::vector<T>& v, const T& t){

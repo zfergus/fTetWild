@@ -76,7 +76,6 @@ int tetrahedralization(GEO::Mesh&       sf_mesh,
     simplify(input_vertices, input_faces, input_tags, tree, mesh.params, skip_simplify);
     tree.init_b_mesh_and_tree(input_vertices, input_faces, mesh);
     logger().info("preprocessing {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::preprocessing_id,
                    timer.getElapsedTimeInSec(),
                    input_vertices.size(),
@@ -99,7 +98,6 @@ int tetrahedralization(GEO::Mesh&       sf_mesh,
     logger().info("#v = {}", mesh.get_v_num());
     logger().info("#t = {}", mesh.get_t_num());
     logger().info("tetrahedralizing {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::tetrahedralization_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -114,7 +112,6 @@ int tetrahedralization(GEO::Mesh&       sf_mesh,
     timer.start();
     insert_triangles(input_vertices, input_faces, input_tags, mesh, is_face_inserted, tree, false);
     logger().info("cutting {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::cutting_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -130,7 +127,6 @@ int tetrahedralization(GEO::Mesh&       sf_mesh,
     timer.start();
     optimization(input_vertices, input_faces, input_tags, is_face_inserted, mesh, tree, {{1, 1, 1, 1}});
     logger().info("mesh optimization {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::optimization_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -174,7 +170,6 @@ int tetrahedralization(GEO::Mesh&       sf_mesh,
     logger().info("#v = {}", mesh.get_v_num());
     logger().info("#t = {}", mesh.get_t_num());
     logger().info("winding number {}s", timer.getElapsedTimeInSec());
-    logger().info("");
 
     MeshIO::extract_volume_mesh(mesh, V, T, false);
 

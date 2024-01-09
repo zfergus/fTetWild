@@ -10,6 +10,7 @@
 #include <floattetwild/LocalOperations.h>
 
 #include <floattetwild/MeshImprovement.h>
+#include <floattetwild/Logger.hpp>
 
 namespace floatTetWild {
     bool is_es_check = false;
@@ -93,10 +94,10 @@ void floatTetWild::edge_swapping(Mesh& mesh) {
         counter++;
     }
 
-    cout << "success3 = " << suc_counter3 << endl;
-    cout << "success4 = " << suc_counter4 << endl;
-    cout << "success5 = " << suc_counter5 << endl;
-    cout << "success = " << (suc_counter3 + suc_counter4 + suc_counter5) << "(" << counter << ")" << endl;
+    logger().debug("success3 = {}", suc_counter3);
+    logger().debug("success4 = {}", suc_counter4);
+    logger().debug("success5 = {}", suc_counter5);
+    logger().info("success = {}({})", suc_counter3 + suc_counter4 + suc_counter5, counter);
 }
 
 bool floatTetWild::remove_an_edge_32(Mesh& mesh, int v1_id, int v2_id, const std::vector<int>& old_t_ids, std::vector<std::array<int, 2>>& new_edges){

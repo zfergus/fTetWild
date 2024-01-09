@@ -94,7 +94,7 @@ void connect_2_meshes(std::string m1, std::string m2, std::string m);
 int main(int argc, char** argv)
 {
 #ifdef STORE_SAMPLE_POINTS
-    cout << "STORE_SAMPLE_POINTS defined" << endl;
+    logger().info("STORE_SAMPLE_POINTS defined");
 #endif
 
     //    connect_2_meshes("/Users/yixinhu/Downloads/test_cutting/100729.stl",
@@ -152,9 +152,10 @@ int main(int argc, char** argv)
     std::vector<int> indices(20);
     std::iota(std::begin(indices), std::end(indices), 0);
     floatTetWild::Random::shuffle(indices);
+    std::stringstream ss;
     for (int a : indices)
-        std::cout << a << " ";
-    std::cout << std::endl;
+        ss << a << " ";
+    logger().info(ss.str());
 
     // Import standard command line arguments, and custom ones
     GEO::CmdLine::import_arg_group("standard");
@@ -272,7 +273,7 @@ int main(int argc, char** argv)
     unsigned int num_threads = std::max(1u, std::thread::hardware_concurrency());
     num_threads              = std::min(max_threads, num_threads);
     params.num_threads       = num_threads;
-    std::cout << "TBB threads " << num_threads << std::endl;
+    logger().info("TBB threads {}", num_threads);
     tbb::task_scheduler_init scheduler(num_threads, stack_size);
 #endif
 
@@ -468,7 +469,6 @@ int main(int argc, char** argv)
     simplify(input_vertices, input_faces, input_tags, tree, params, skip_simplify);
     tree.init_b_mesh_and_tree(input_vertices, input_faces, mesh);
     logger().info("preprocessing {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::preprocessing_id,
                    timer.getElapsedTimeInSec(),
                    input_vertices.size(),
@@ -484,7 +484,6 @@ int main(int argc, char** argv)
     logger().info("#v = {}", mesh.get_v_num());
     logger().info("#t = {}", mesh.get_t_num());
     logger().info("tetrahedralizing {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::tetrahedralization_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -495,7 +494,6 @@ int main(int argc, char** argv)
     timer.start();
     insert_triangles(input_vertices, input_faces, input_tags, mesh, is_face_inserted, tree, false);
     logger().info("cutting {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::cutting_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -508,7 +506,6 @@ int main(int argc, char** argv)
     ////    cutting(input_vertices, input_faces, mesh, is_face_inserted, tree);
     //    cutting(input_vertices, input_faces, input_tags, mesh, is_face_inserted, tree);
     //    logger().info("cutting {}s", timer.getElapsedTimeInSec());
-    //    logger().info("");
     //    stats().record(StateInfo::cutting_id, timer.getElapsedTimeInSec(), mesh.get_v_num(),
     //    mesh.get_t_num(),
     //                                                   mesh.get_max_energy(),
@@ -520,7 +517,6 @@ int main(int argc, char** argv)
     optimization(
       input_vertices, input_faces, input_tags, is_face_inserted, mesh, tree, {{1, 1, 1, 1}});
     logger().info("mesh optimization {}s", timer.getElapsedTimeInSec());
-    logger().info("");
     stats().record(StateInfo::optimization_id,
                    timer.getElapsedTimeInSec(),
                    mesh.get_v_num(),
@@ -598,7 +594,6 @@ int main(int argc, char** argv)
     logger().info("#v = {}", mesh.get_v_num());
     logger().info("#t = {}", mesh.get_t_num());
     logger().info("winding number {}s", timer.getElapsedTimeInSec());
-    logger().info("");
 
     //    if (params.output_path.size() > 3
     //        && params.output_path.substr(params.output_path.size() - 3, params.output_path.size())
